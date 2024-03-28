@@ -25,7 +25,7 @@ public class EventProvider {
     private UUID id;
 
     @NotNull
-    private String username;
+    private String userName;
 
     @NotNull
     private String email;
@@ -34,7 +34,7 @@ public class EventProvider {
     private String password;
 
     @NotNull
-    private String org_Name;
+    private String orgName;
 
     @NotNull
     private long phoneNumber;
