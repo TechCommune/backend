@@ -17,12 +17,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thbs.backend.Models.AdminModel;
 import com.thbs.backend.Models.EmailModel;
 import com.thbs.backend.Models.EventProvider;
 import com.thbs.backend.Models.LoginModel;
 import com.thbs.backend.Models.OTPModel;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Models.UserModel;
+import com.thbs.backend.Repositories.AdminRepo;
 import com.thbs.backend.Repositories.EventProviderRepo;
 import com.thbs.backend.Repositories.OtpRepo;
 import com.thbs.backend.Repositories.UserRepo;
@@ -33,6 +35,9 @@ public class UserService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private AdminRepo adminRepo;
 
     @Autowired
     private EventProviderRepo eventProviderRepo;
@@ -86,6 +91,31 @@ public class UserService {
             otpRepo.save(otp);
             responseMessage.setSuccess(true);
             responseMessage.setMessage(response);
+            return ResponseEntity.ok().body(responseMessage);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
+        }
+    }
+
+    public ResponseEntity<Object> generateOTPforTwoFAServiceAdmin(AdminModel adminModel) {
+        try {
+            int otpForTwoFA = OTPGenerator.generateRandom6DigitNumber();
+            OTPModel otp = new OTPModel();
+
+            otp.setEmail(adminModel.getEmail());
+            otp.setOtp(otpForTwoFA);
+            otp.setUseCase("login");
+            otp.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
+
+            emailModel.setRecipient(adminModel.getEmail());
+            emailModel.setSubject("OTP for Two-Factor Authentication");
+            emailModel.setMsgBody("Your OTP for Two-Factor Authentication is " + otpForTwoFA
+                    + ". It is valid only for 1 minutes.");
+
+            String response = emailService.sendSimpleMail(emailModel);
+            responseMessage.setSuccess(true);
+            responseMessage.setMessage(response);
+            otpRepo.save(otp);
             return ResponseEntity.ok().body(responseMessage);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
@@ -170,6 +200,28 @@ public class UserService {
                     }
                 }
 
+                else if (role.equals("admin")) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    AdminModel admin = objectMapper.convertValue(userOrService,
+                            AdminModel.class);
+                    // AdminModel AdminByEmail = adminRepo
+                    //         .findByEmail(admin.getEmail());
+
+                    if (adminRepo.count()==0) {
+                        admin.setPassword(hashPassword(admin.getPassword()));
+                        adminRepo.save(admin);
+                        responseMessage.setSuccess(true);
+                        responseMessage.setMessage("Admin Account Created Successfully!");
+                        responseMessage.setToken(authService.generateToken(admin.getEmail()));
+                        return ResponseEntity.ok().body(responseMessage);
+                    } else {
+                        responseMessage.setSuccess(false);
+                        responseMessage.setMessage("Admin already exists!");
+                        responseMessage.setToken(null);
+                        return ResponseEntity.badRequest().body(responseMessage);
+                    }
+                }
+
                 else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid Input!");
@@ -211,9 +263,31 @@ public class UserService {
                     return ResponseEntity.badRequest().body(responseMessage);
                 }
             } 
-            else {
-                EventProvider eventProvider = eventProviderRepo
-                        .findByEmail(loginModel.getEmail());
+            else if (role.equals("admin")){
+                AdminModel adminModel = adminRepo.findByEmail(loginModel.getEmail());
+
+                if (adminModel != null) {
+                    if (BCrypt.checkpw(loginModel.getPassword(), adminModel.getPassword())) {
+                        responseMessage.setSuccess(true);
+                        responseMessage.setMessage(" Admin Logged in Successfully!");
+                        responseMessage.setToken(null);
+                        generateOTPforTwoFAServiceAdmin(adminModel);
+                        return ResponseEntity.ok().body(responseMessage);
+                    } else {
+                        responseMessage.setSuccess(false);
+                        responseMessage.setMessage("Invalid email or password");
+                        responseMessage.setToken(null);
+                        return ResponseEntity.badRequest().body(responseMessage);
+                    }
+                } else {
+                    responseMessage.setSuccess(false);
+                    responseMessage.setMessage("Invalid email or password");
+                    return ResponseEntity.badRequest().body(responseMessage);
+                }
+            }
+
+            else if (role.equals("eventprovider")){
+                EventProvider eventProvider = eventProviderRepo.findByEmail(loginModel.getEmail());
 
                 if (eventProvider != null) {
                     if (BCrypt.checkpw(loginModel.getPassword(), eventProvider.getPassword())) {
@@ -234,7 +308,11 @@ public class UserService {
                     return ResponseEntity.badRequest().body(responseMessage);
                 }
             }
-            
+            else {
+                responseMessage.setSuccess(false);
+                    responseMessage.setMessage("Invalid role");
+                    return ResponseEntity.badRequest().body(responseMessage);
+            }
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
