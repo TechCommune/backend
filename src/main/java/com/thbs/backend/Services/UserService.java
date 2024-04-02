@@ -97,6 +97,31 @@ public class UserService {
         }
     }
 
+    public ResponseEntity<Object> generateOTPforTwoFAServiceAdmin(AdminModel adminModel) {
+        try {
+            int otpForTwoFA = OTPGenerator.generateRandom6DigitNumber();
+            OTPModel otp = new OTPModel();
+
+            otp.setEmail(adminModel.getEmail());
+            otp.setOtp(otpForTwoFA);
+            otp.setUseCase("login");
+            otp.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
+
+            emailModel.setRecipient(adminModel.getEmail());
+            emailModel.setSubject("OTP for Two-Factor Authentication");
+            emailModel.setMsgBody("Your OTP for Two-Factor Authentication is " + otpForTwoFA
+                    + ". It is valid only for 1 minutes.");
+
+            String response = emailService.sendSimpleMail(emailModel);
+            responseMessage.setSuccess(true);
+            responseMessage.setMessage(response);
+            otpRepo.save(otp);
+            return ResponseEntity.ok().body(responseMessage);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
+        }
+    }
+
     public ResponseEntity<Object> generateOTPforTwoFAServiceProviderService(EventProvider eventProvider) {
         try {
             int otpForTwoFA = OTPGenerator.generateRandom6DigitNumber();
@@ -238,9 +263,31 @@ public class UserService {
                     return ResponseEntity.badRequest().body(responseMessage);
                 }
             } 
-            else {
-                EventProvider eventProvider = eventProviderRepo
-                        .findByEmail(loginModel.getEmail());
+            else if (role.equals("admin")){
+                AdminModel adminModel = adminRepo.findByEmail(loginModel.getEmail());
+
+                if (adminModel != null) {
+                    if (BCrypt.checkpw(loginModel.getPassword(), adminModel.getPassword())) {
+                        responseMessage.setSuccess(true);
+                        responseMessage.setMessage(" Admin Logged in Successfully!");
+                        responseMessage.setToken(null);
+                        generateOTPforTwoFAServiceAdmin(adminModel);
+                        return ResponseEntity.ok().body(responseMessage);
+                    } else {
+                        responseMessage.setSuccess(false);
+                        responseMessage.setMessage("Invalid email or password");
+                        responseMessage.setToken(null);
+                        return ResponseEntity.badRequest().body(responseMessage);
+                    }
+                } else {
+                    responseMessage.setSuccess(false);
+                    responseMessage.setMessage("Invalid email or password");
+                    return ResponseEntity.badRequest().body(responseMessage);
+                }
+            }
+
+            else if (role.equals("eventprovider")){
+                EventProvider eventProvider = eventProviderRepo.findByEmail(loginModel.getEmail());
 
                 if (eventProvider != null) {
                     if (BCrypt.checkpw(loginModel.getPassword(), eventProvider.getPassword())) {
@@ -261,7 +308,11 @@ public class UserService {
                     return ResponseEntity.badRequest().body(responseMessage);
                 }
             }
-            
+            else {
+                responseMessage.setSuccess(false);
+                    responseMessage.setMessage("Invalid role");
+                    return ResponseEntity.badRequest().body(responseMessage);
+            }
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
