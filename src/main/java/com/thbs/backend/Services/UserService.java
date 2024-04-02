@@ -17,12 +17,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thbs.backend.Models.AdminModel;
 import com.thbs.backend.Models.EmailModel;
 import com.thbs.backend.Models.EventProvider;
 import com.thbs.backend.Models.LoginModel;
 import com.thbs.backend.Models.OTPModel;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Models.UserModel;
+import com.thbs.backend.Repositories.AdminRepo;
 import com.thbs.backend.Repositories.EventProviderRepo;
 import com.thbs.backend.Repositories.OtpRepo;
 import com.thbs.backend.Repositories.UserRepo;
@@ -33,6 +35,9 @@ public class UserService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private AdminRepo adminRepo;
 
     @Autowired
     private EventProviderRepo eventProviderRepo;
@@ -165,6 +170,28 @@ public class UserService {
                     } else {
                         responseMessage.setSuccess(false);
                         responseMessage.setMessage("User with this email already exists!");
+                        responseMessage.setToken(null);
+                        return ResponseEntity.badRequest().body(responseMessage);
+                    }
+                }
+
+                else if (role.equals("admin")) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    AdminModel admin = objectMapper.convertValue(userOrService,
+                            AdminModel.class);
+                    // AdminModel AdminByEmail = adminRepo
+                    //         .findByEmail(admin.getEmail());
+
+                    if (adminRepo.count()==0) {
+                        admin.setPassword(hashPassword(admin.getPassword()));
+                        adminRepo.save(admin);
+                        responseMessage.setSuccess(true);
+                        responseMessage.setMessage("Admin Account Created Successfully!");
+                        responseMessage.setToken(authService.generateToken(admin.getEmail()));
+                        return ResponseEntity.ok().body(responseMessage);
+                    } else {
+                        responseMessage.setSuccess(false);
+                        responseMessage.setMessage("Admin already exists!");
                         responseMessage.setToken(null);
                         return ResponseEntity.badRequest().body(responseMessage);
                     }
