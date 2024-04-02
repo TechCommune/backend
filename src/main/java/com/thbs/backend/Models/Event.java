@@ -9,23 +9,25 @@ import jakarta.validation.constraints.NotNull;
 
 import jakarta.persistence.Entity;
 import org.springframework.stereotype.Component;
-import jakarta.persistence.Column;
+//import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @Data
 @Component
+@Table(name = "event_db")
 public class Event {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "event_id")
-    private UUID id;
+    //@Column(name = "event_id")
+    private UUID eventId;
 
     @NotNull
-    private UUID event_org_id;
+    private UUID eventOrgId;
 
     @NotNull
     private String title;
@@ -45,5 +47,13 @@ public class Event {
     private int price;
 
     private boolean paymentRequired;
+
+    private double rating;
+
+    private int numberOfRatings;
+
+    private float ratingSum;
+
+  
   
 }
