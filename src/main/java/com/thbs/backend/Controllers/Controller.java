@@ -2,26 +2,28 @@ package com.thbs.backend.Controllers;
 
 import java.util.List;
 
-//import java.util.UUID;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-//import org.springframework.web.bind.annotation.PutMapping;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.thbs.backend.Models.Event;
 import com.thbs.backend.Models.EventDetails;
 import com.thbs.backend.Models.LoginModel;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Services.AddEventDetails;
-import com.thbs.backend.Services.UpdateEventDetails;
+
+import com.thbs.backend.Services.GetEventAndUpdate;
 import com.thbs.backend.Services.UserService;
 
 import jakarta.validation.Valid;
@@ -37,7 +39,7 @@ public class Controller {
     private AddEventDetails addEventDetails;
 
     @Autowired
-    private UpdateEventDetails updateEventDetails;
+    private GetEventAndUpdate getEventAndUpdate;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -77,19 +79,21 @@ public class Controller {
         return userService.resetThePasswordService(passwordFromUser, role, email);
     }
 
-
-
     @PostMapping("addevent")
-    public ResponseEntity<ResponseMessage> addEvent(@RequestHeader String role,@RequestHeader String token,  @RequestBody List<EventDetails> eventdetails)
-    {
+    public ResponseEntity<ResponseMessage> addEvent(@RequestHeader String role, @RequestHeader String token,
+            @RequestBody List<EventDetails> eventdetails) {
         return addEventDetails.addEvent(eventdetails, token, role);
     }
 
-  
- 
+    @GetMapping("getevent/{eventId}")
+    public Event updateEvent(@PathVariable UUID eventId) {
+        return getEventAndUpdate.getEvent(eventId);
+    }
+
+    @PutMapping("updateevent/{eventId}")
+    public ResponseEntity<ResponseMessage> updateEvent(@PathVariable UUID eventId, @RequestHeader String role,
+            @RequestHeader String token, @RequestBody Event eventToBeUpdated) {
+        return getEventAndUpdate.updateEvent(token, role, eventId, eventToBeUpdated);
+    }
+
 }
-
-
-    
-
-
