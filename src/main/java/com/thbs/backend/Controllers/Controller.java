@@ -84,6 +84,10 @@ public class Controller {
         return addEventDetails.addEvent(eventdetails, token, role);
     }
 
+    @GetMapping("getallevent")
+    public List<Event> getAllEvent(){
+        return getEventAndUpdate.getAllEvent();
+    }
     @GetMapping("getevent/{eventId}")
     public Event updateEvent(@PathVariable UUID eventId) {
         return getEventAndUpdate.getEvent(eventId);

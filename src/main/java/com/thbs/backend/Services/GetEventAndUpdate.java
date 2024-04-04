@@ -1,5 +1,6 @@
 package com.thbs.backend.Services;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,10 @@ public class GetEventAndUpdate {
 
     @Autowired
     private ResponseMessage responseMessage;
+
+    public List<Event> getAllEvent(){
+        return eventRepo.findAll();
+    }
 
     public Event getEvent(UUID eventId) {
         return eventRepo.findByEventId(eventId);
