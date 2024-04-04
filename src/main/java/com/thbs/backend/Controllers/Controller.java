@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -88,13 +87,13 @@ public class Controller {
     public List<Event> getAllEvent(){
         return getEventAndUpdate.getAllEvent();
     }
-    @GetMapping("getevent/{eventId}")
-    public Event updateEvent(@PathVariable UUID eventId) {
+    @GetMapping("getevent")
+    public Event updateEvent(@RequestHeader UUID eventId) {
         return getEventAndUpdate.getEvent(eventId);
     }
 
-    @PutMapping("updateevent/{eventId}")
-    public ResponseEntity<ResponseMessage> updateEvent(@PathVariable UUID eventId, @RequestHeader String role,
+    @PutMapping("updateevent")
+    public ResponseEntity<ResponseMessage> updateEvent(@RequestHeader UUID eventId, @RequestHeader String role,
             @RequestHeader String token, @RequestBody Event eventToBeUpdated) {
         return getEventAndUpdate.updateEvent(token, role, eventId, eventToBeUpdated);
     }
