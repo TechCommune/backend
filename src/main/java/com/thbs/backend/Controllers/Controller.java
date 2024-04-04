@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -96,6 +97,12 @@ public class Controller {
     public ResponseEntity<ResponseMessage> updateEvent(@RequestHeader UUID eventId, @RequestHeader String role,
             @RequestHeader String token, @RequestBody Event eventToBeUpdated) {
         return getEventAndUpdate.updateEvent(token, role, eventId, eventToBeUpdated);
+    }
+
+    @DeleteMapping("deleteevent")
+    public ResponseEntity<ResponseMessage> deleteEvent(@RequestHeader UUID eventId,@RequestHeader String role, @RequestHeader String token)
+    {
+        return getEventAndUpdate.deleteEvent(token, role, eventId);
     }
 
 }

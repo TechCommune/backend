@@ -28,7 +28,7 @@ public class GetEventAndUpdate {
     @Autowired
     private ResponseMessage responseMessage;
 
-    public List<Event> getAllEvent(){
+    public List<Event> getAllEvent() {
         return eventRepo.findAll();
     }
 
@@ -71,6 +71,35 @@ public class GetEventAndUpdate {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
 
+    }
+
+    public ResponseEntity<ResponseMessage> deleteEvent(String token, String role, UUID eventId) {
+        try {
+
+            String email = authService.verifyToken(token);
+            String eventOrgId = eventProviderRepo.findByEmail(email).getId().toString();
+            Event event = eventRepo.findByEventId(eventId);
+
+            if (event == null) {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("Event with ID: " + eventId + " not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
+            }
+
+            if (!event.getEventOrgId().toString().equals(eventOrgId)) {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("You do not have permission to delete this event");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
+            }
+            eventRepo.delete(event);
+            responseMessage.setSuccess(true);
+            responseMessage.setMessage("Event deleted successfully");
+            return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+        } catch (Exception e) {
+            responseMessage.setSuccess(false);
+            responseMessage.setMessage("Internal Server Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+        }
     }
 
 }
