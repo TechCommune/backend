@@ -15,6 +15,7 @@ public class EventDetails {
     private String mode;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private int maxCapacity;
     private int price;
     private boolean paymentRequired;
 

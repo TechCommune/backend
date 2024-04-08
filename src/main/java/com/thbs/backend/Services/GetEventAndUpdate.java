@@ -51,6 +51,7 @@ public class GetEventAndUpdate {
                 eventFetched.setMode(eventToBeUpdated.getMode());
                 eventFetched.setStartTime(eventToBeUpdated.getStartTime());
                 eventFetched.setEndTime(eventToBeUpdated.getEndTime());
+                eventFetched.setMaxCapacity(eventToBeUpdated.getMaxCapacity());
                 eventFetched.setPrice(eventToBeUpdated.getPrice());
                 eventFetched.setPaymentRequired(eventToBeUpdated.isPaymentRequired());
 

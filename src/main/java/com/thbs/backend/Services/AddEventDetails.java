@@ -53,6 +53,7 @@ public class AddEventDetails {
                     event.setMode(eventdetails.get(i).getMode());
                     event.setStartTime(eventdetails.get(i).getStartTime());
                     event.setEndTime(eventdetails.get(i).getEndTime());
+                    event.setMaxCapacity(eventdetails.get(i).getMaxCapacity());
                     event.setPrice(eventdetails.get(i).getPrice());
                     event.setPaymentRequired(eventdetails.get(i).isPaymentRequired());
                     eventRepo.save(event);

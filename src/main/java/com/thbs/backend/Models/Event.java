@@ -44,6 +44,8 @@ public class Event {
 
     private LocalDateTime endTime;
 
+    private int maxCapacity;
+
     private int price;
 
     private boolean paymentRequired;
