@@ -4,13 +4,16 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.thbs.backend.Models.Event;
+
 import com.thbs.backend.Models.EventEnrollment;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Repositories.EventEnrollRepo;
 import com.thbs.backend.Repositories.EventRepo;
+import com.thbs.backend.Repositories.UserRepo;
 
 @Service
 public class EventEnrollmentService {
@@ -21,35 +24,56 @@ public class EventEnrollmentService {
     @Autowired
     private EventEnrollRepo eventEnrollmentRepo;
 
-    public ResponseMessage enrollUser(UUID userId, UUID eventId, int price, boolean paymentRequired) {
-        ResponseMessage response = new ResponseMessage();
-        Event event = eventRepo.findById(eventId).orElse(null);
-        if (event == null) {
-            response.setSuccess(false);
-            response.setMessage("Event with ID: " + eventId + " not found");
-            return response;
+    @Autowired
+    private AuthService authService;
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private ResponseMessage responseMessage;
+
+    
+    public ResponseEntity<ResponseMessage> enrollUser(EventEnrollment eventEnrollment, String token) {
+        try {
+            String email = authService.verifyToken(token);
+            String userId = userRepo.findByEmail(email).getId().toString();
+    
+            // Check if the event exists
+            if (!eventRepo.existsById(eventEnrollment.getEventId())) {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("Event Not Found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(responseMessage);
+            }
+    
+            // Check if the event has reached its maximum capacity
+            int enrolledUsers = (int) eventEnrollmentRepo.countByEventId(eventEnrollment.getEventId());
+            int maxCapacity = eventRepo.findById(eventEnrollment.getEventId()).get().getMaxCapacity();
+            if (enrolledUsers >= maxCapacity) {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("Event has reached maximum capacity");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(responseMessage);
+            }
+    
+            // Enroll the user for the event
+            EventEnrollment eventEnroll = new EventEnrollment();
+            eventEnroll.setUserId(UUID.fromString(userId));
+            eventEnroll.setEventId(eventEnrollment.getEventId());
+            eventEnroll.setEnrollmentDate(eventEnrollment.getEnrollmentDate()); // Assuming Date class is available for date handling
+            eventEnroll.setPrice(eventEnrollment.getPrice());
+            eventEnroll.setPaymentRequired(eventEnrollment.isPaymentRequired());
+            eventEnrollmentRepo.save(eventEnroll);
+
+            responseMessage.setSuccess(true);
+            responseMessage.setMessage("User Enrolled Successfully");
+            return ResponseEntity.ok().body(responseMessage);
+        } catch (Exception e) {
+            responseMessage.setSuccess(false);
+            responseMessage.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
-
-        // Check if there is available capacity for additional participants
-        if (event.getMaxCapacity() <= eventEnrollmentRepo.countByEventId(eventId)) {
-            response.setSuccess(false);
-            response.setMessage("Event is already full. Cannot enroll more participants.");
-            return response;
-        }
-
-        // Perform any additional checks before enrolling the user, such as checking if the event is full, etc.
-        // For simplicity, let's assume the enrollment is always successful here.
-        EventEnrollment enrollment = new EventEnrollment();
-        enrollment.setUserId(userId);
-        enrollment.setEventId(eventId);
-        enrollment.setPrice(price);
-        enrollment.setPaymentRequired(paymentRequired);
-
-        eventEnrollmentRepo.save(enrollment);
-
-        response.setSuccess(true);
-        response.setMessage("User enrolled successfully for the event");
-        return response;
     }
     public List<EventEnrollment> getEnrollmentsByUserId(UUID userId) {
         return eventEnrollmentRepo.findByUserId(userId);

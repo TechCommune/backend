@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.stereotype.Component;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import lombok.Data;
 
 @Entity
 @Data
+@Component
 public class EventEnrollment {
     @Id
     @GeneratedValue(generator = "UUID")

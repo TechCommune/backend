@@ -18,10 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thbs.backend.Models.Event;
 import com.thbs.backend.Models.EventDetails;
+import com.thbs.backend.Models.EventEnrollment;
 import com.thbs.backend.Models.LoginModel;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Services.AddEventDetails;
-
+import com.thbs.backend.Services.EventEnrollmentService;
 import com.thbs.backend.Services.GetEventAndUpdate;
 import com.thbs.backend.Services.UserService;
 
@@ -39,6 +40,9 @@ public class Controller {
 
     @Autowired
     private GetEventAndUpdate getEventAndUpdate;
+
+    @Autowired
+    private EventEnrollmentService enrollmentService;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -105,4 +109,15 @@ public class Controller {
         return getEventAndUpdate.deleteEvent(token, role, eventId);
     }
 
+    @PostMapping("enroll")
+    public ResponseEntity<ResponseMessage> enrollUser(@RequestBody EventEnrollment eventEnrollment,
+            @RequestHeader String token) {
+        return enrollmentService.enrollUser(eventEnrollment, token);
+    }
+
+    @GetMapping("getallenroll")
+    public List<EventEnrollment> getAEnrollments(@RequestHeader UUID eventId)
+    {
+        return enrollmentService.getEnrollmentsByEventId(eventId);
+    }
 }
