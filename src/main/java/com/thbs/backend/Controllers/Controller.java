@@ -134,6 +134,6 @@ public class Controller {
     @PostMapping("addeventrating")
     public ResponseEntity<ResponseMessage> addEventRating(@RequestHeader String eventOrgId,@RequestHeader String eventId,@RequestHeader float rating)
     {
-        return eventRating.eventrating(eventOrgId,eventId,rating);
+        return eventRating.addEventRating(eventOrgId,eventId,rating);
     }
 }

@@ -20,7 +20,7 @@ public class EventRating {
     @Autowired
     private ResponseMessage responseMessage;
 
-    public ResponseEntity<ResponseMessage> eventrating(String eventOrgId, String eventId, float rating) {
+    public ResponseEntity<ResponseMessage> addEventRating(String eventOrgId, String eventId, float rating) {
         try {
             if (rating > 5 || rating < 0) {
                 responseMessage.setSuccess(false);
