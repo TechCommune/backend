@@ -120,4 +120,10 @@ public class Controller {
     {
         return enrollmentService.getEnrollmentsByEventId(eventId);
     }
+
+    @GetMapping("getuserenroll")
+    public List<EventEnrollment> getUserEnrolls(@RequestHeader UUID userId)
+    {
+        return enrollmentService.getEnrollmentsByUserId(userId);
+    }
 }
