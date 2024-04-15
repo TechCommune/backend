@@ -23,6 +23,7 @@ import com.thbs.backend.Models.LoginModel;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Services.AddEventDetails;
 import com.thbs.backend.Services.EventEnrollmentService;
+import com.thbs.backend.Services.EventRating;
 import com.thbs.backend.Services.GetEventAndUpdate;
 import com.thbs.backend.Services.UserService;
 
@@ -43,6 +44,9 @@ public class Controller {
 
     @Autowired
     private EventEnrollmentService enrollmentService;
+
+    @Autowired
+    private EventRating eventRating;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -125,5 +129,11 @@ public class Controller {
     public List<EventEnrollment> getUserEnrolls(@RequestHeader UUID userId)
     {
         return enrollmentService.getEnrollmentsByUserId(userId);
+    }
+
+    @PostMapping("addeventrating")
+    public ResponseEntity<ResponseMessage> addEventRating(@RequestHeader String eventOrgId,@RequestHeader String eventId,@RequestHeader float rating)
+    {
+        return eventRating.eventrating(eventOrgId,eventId,rating);
     }
 }
