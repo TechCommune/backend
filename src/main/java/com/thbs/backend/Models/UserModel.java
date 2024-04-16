@@ -23,7 +23,7 @@ public class UserModel {
     private UUID id;
 
     @NotNull
-    private String username;
+    private String userName;
 
     @NotNull
     private String email;

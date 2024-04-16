@@ -118,6 +118,12 @@ public class Controller {
             @RequestHeader String token) {
         return enrollmentService.enrollUser(eventEnrollment, token);
     }
+    @PostMapping("/cancelEnrollment")
+    public ResponseEntity<ResponseMessage> cancelEnrollment(@RequestHeader String token,
+                                                             @RequestHeader UUID eventId) {
+
+        return enrollmentService.cancelEnrollment(token, eventId);
+    }
 
     @GetMapping("getallenroll")
     public List<EventEnrollment> getAEnrollments(@RequestHeader UUID eventId)
