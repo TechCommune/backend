@@ -8,12 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-
 import com.thbs.backend.Models.EventEnrollment;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Repositories.EventEnrollRepo;
 import com.thbs.backend.Repositories.EventRepo;
 import com.thbs.backend.Repositories.UserRepo;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class EventEnrollmentService {
@@ -33,12 +34,21 @@ public class EventEnrollmentService {
     @Autowired
     private ResponseMessage responseMessage;
 
-    
     public ResponseEntity<ResponseMessage> enrollUser(EventEnrollment eventEnrollment, String token) {
         try {
             String email = authService.verifyToken(token);
             String userId = userRepo.findByEmail(email).getId().toString();
-    
+
+            // Check if the user is already enrolled in the event
+            UUID eventId = eventEnrollment.getEventId();
+            UUID userIdUUID = UUID.fromString(userId);
+            boolean isEnrolled = eventEnrollmentRepo.existsByUserIdAndEventId(userIdUUID, eventId);
+            if (isEnrolled) {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("You have already enrolled to this event");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+
             // Check if the event exists
             if (!eventRepo.existsById(eventEnrollment.getEventId())) {
                 responseMessage.setSuccess(false);
@@ -46,7 +56,7 @@ public class EventEnrollmentService {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(responseMessage);
             }
-    
+
             // Check if the event has reached its maximum capacity
             int enrolledUsers = (int) eventEnrollmentRepo.countByEventId(eventEnrollment.getEventId());
             int maxCapacity = eventRepo.findById(eventEnrollment.getEventId()).get().getMaxCapacity();
@@ -56,12 +66,13 @@ public class EventEnrollmentService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(responseMessage);
             }
-    
+
             // Enroll the user for the event
             EventEnrollment eventEnroll = new EventEnrollment();
             eventEnroll.setUserId(UUID.fromString(userId));
             eventEnroll.setEventId(eventEnrollment.getEventId());
-            eventEnroll.setEnrollmentDate(eventEnrollment.getEnrollmentDate()); // Assuming Date class is available for date handling
+            eventEnroll.setEnrollmentDate(eventEnrollment.getEnrollmentDate()); // Assuming Date class is available for
+                                                                                // date handling
             eventEnroll.setPrice(eventEnrollment.getPrice());
             eventEnroll.setPaymentRequired(eventEnrollment.isPaymentRequired());
             eventEnrollmentRepo.save(eventEnroll);
@@ -75,6 +86,7 @@ public class EventEnrollmentService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
     }
+
     public List<EventEnrollment> getEnrollmentsByUserId(UUID userId) {
         return eventEnrollmentRepo.findByUserId(userId);
     }
@@ -83,5 +95,31 @@ public class EventEnrollmentService {
         return eventEnrollmentRepo.findByEventId(eventId);
     }
 
+    @Transactional
+    public ResponseEntity<ResponseMessage> cancelEnrollment(String token, UUID eventId) {
+        try {
+            String email = authService.verifyToken(token);
+            String userId = userRepo.findByEmail(email).getId().toString();
     
+            UUID userIdUUID = UUID.fromString(userId);
+            boolean isEnrolled = eventEnrollmentRepo.existsByUserIdAndEventId(userIdUUID, eventId);
+            if (!isEnrolled) {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("You have no enrollments for this event");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+    
+            eventEnrollmentRepo.deleteByUserIdAndEventId(userIdUUID, eventId);
+    
+            responseMessage.setSuccess(true);
+            responseMessage.setMessage("Enrollment canceled successfully");
+            return ResponseEntity.ok().body(responseMessage);
+        } catch (Exception e) {
+            responseMessage.setSuccess(false);
+            responseMessage.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+        }
+    }
+    
+
 }
