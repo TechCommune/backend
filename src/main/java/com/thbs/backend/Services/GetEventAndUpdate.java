@@ -32,8 +32,25 @@ public class GetEventAndUpdate {
         return eventRepo.findAll();
     }
 
-    public Event getEvent(UUID eventId) {
-        return eventRepo.findByEventId(eventId);
+    public ResponseEntity<Object> getEvent(UUID eventId) {
+
+        try {
+            Event eventFetched = eventRepo.findByEventId(eventId);
+            if (eventFetched == null) {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("No Event Exists By This Id");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(eventFetched);
+
+            }
+
+        } catch (Exception e) {
+            responseMessage.setSuccess(false);
+            responseMessage.setMessage("Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+        }
+
     }
 
     public ResponseEntity<ResponseMessage> updateEvent(String token, String role, UUID eventId,
@@ -42,7 +59,7 @@ public class GetEventAndUpdate {
 
             String email = authService.verifyToken(token);
             String event_org_id = eventProviderRepo.findByEmail(email).getId().toString();
-            Event eventFetched = getEvent(eventId);
+            Event eventFetched = eventRepo.findByEventId(eventId);
             if (event_org_id.equals(eventFetched.getEventOrgId().toString())) {
 
                 eventFetched.setTitle(eventToBeUpdated.getTitle());
