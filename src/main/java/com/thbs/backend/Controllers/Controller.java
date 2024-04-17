@@ -21,10 +21,12 @@ import com.thbs.backend.Models.EventDetails;
 import com.thbs.backend.Models.EventEnrollment;
 import com.thbs.backend.Models.LoginModel;
 import com.thbs.backend.Models.ResponseMessage;
+import com.thbs.backend.Models.ReviewDetails;
 import com.thbs.backend.Services.AddEventDetails;
 import com.thbs.backend.Services.EventEnrollmentService;
 import com.thbs.backend.Services.EventRating;
 import com.thbs.backend.Services.GetEventAndUpdate;
+import com.thbs.backend.Services.ReviewService;
 import com.thbs.backend.Services.UserService;
 
 import jakarta.validation.Valid;
@@ -47,6 +49,9 @@ public class Controller {
 
     @Autowired
     private EventRating eventRating;
+
+    @Autowired
+    private ReviewService reviewService;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -93,11 +98,12 @@ public class Controller {
     }
 
     @GetMapping("getallevent")
-    public List<Event> getAllEvent(){
+    public List<Event> getAllEvent() {
         return getEventAndUpdate.getAllEvent();
     }
+
     @GetMapping("getevent")
-    public Event updateEvent(@RequestHeader UUID eventId) {
+    public ResponseEntity<Object> getEvent(@RequestHeader UUID eventId) {
         return getEventAndUpdate.getEvent(eventId);
     }
 
@@ -108,8 +114,8 @@ public class Controller {
     }
 
     @DeleteMapping("deleteevent")
-    public ResponseEntity<ResponseMessage> deleteEvent(@RequestHeader UUID eventId,@RequestHeader String role, @RequestHeader String token)
-    {
+    public ResponseEntity<ResponseMessage> deleteEvent(@RequestHeader UUID eventId, @RequestHeader String role,
+            @RequestHeader String token) {
         return getEventAndUpdate.deleteEvent(token, role, eventId);
     }
 
@@ -118,28 +124,50 @@ public class Controller {
             @RequestHeader String token) {
         return enrollmentService.enrollUser(eventEnrollment, token);
     }
+
     @PostMapping("/cancelEnrollment")
     public ResponseEntity<ResponseMessage> cancelEnrollment(@RequestHeader String token,
-                                                             @RequestHeader UUID eventId) {
+            @RequestHeader UUID eventId) {
 
         return enrollmentService.cancelEnrollment(token, eventId);
     }
 
     @GetMapping("getallenroll")
-    public List<EventEnrollment> getAEnrollments(@RequestHeader UUID eventId)
-    {
+    public List<EventEnrollment> getAEnrollments(@RequestHeader UUID eventId) {
         return enrollmentService.getEnrollmentsByEventId(eventId);
     }
 
     @GetMapping("getuserenroll")
-    public List<EventEnrollment> getUserEnrolls(@RequestHeader UUID userId)
-    {
+    public List<EventEnrollment> getUserEnrolls(@RequestHeader UUID userId) {
         return enrollmentService.getEnrollmentsByUserId(userId);
     }
 
     @PostMapping("addeventrating")
-    public ResponseEntity<ResponseMessage> addEventRating(@RequestHeader String eventOrgId,@RequestHeader String eventId,@RequestHeader float rating)
+    public ResponseEntity<ResponseMessage> addEventRating(@RequestHeader String eventOrgId,
+            @RequestHeader String eventId, @RequestHeader float rating) {
+        return eventRating.addEventRating(eventOrgId, eventId, rating);
+    }
+
+    @PostMapping("addreview")
+    public ResponseEntity<ResponseMessage> addReview(@RequestHeader String token,
+            @RequestBody ReviewDetails reviewDetails) {
+        return reviewService.addReview(token, reviewDetails);
+    }
+
+    @GetMapping("getreview")
+    public ResponseEntity<Object> getReview(@RequestHeader String eventId) {
+        return reviewService.getReview(eventId);
+    }
+
+    @PutMapping("updatereview")
+    public ResponseEntity<ResponseMessage> updateReview(@RequestHeader String token, @RequestBody ReviewDetails reviewDetails)
     {
-        return eventRating.addEventRating(eventOrgId,eventId,rating);
+        return reviewService.updateReview(token, reviewDetails);
+    }
+
+    @DeleteMapping("deletereview")
+    public ResponseEntity<ResponseMessage> deleteReview(@RequestHeader String token,@RequestHeader UUID reviewId)
+    {
+        return reviewService.deleteReview(token, reviewId);
     }
 }
