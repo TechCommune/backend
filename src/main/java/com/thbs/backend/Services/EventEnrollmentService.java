@@ -31,6 +31,21 @@ public class EventEnrollmentService {
     @Autowired
     private UserRepo userRepo;
 
+    // @Autowired
+    // private QRCodeEncryptionService encryptionService;
+
+    @Autowired
+    private AESEncryptionService encryptDecryptService;
+
+    @Autowired
+    private QRCodeService qrCodeService;
+
+    @Autowired
+    private QRCodeMailService qrCodeMailService;
+
+    @Autowired
+    private PDFService pdfService;
+
     @Autowired
     private ResponseMessage responseMessage;
 
@@ -40,9 +55,9 @@ public class EventEnrollmentService {
             String userId = userRepo.findByEmail(email).getId().toString();
 
             // Check if the user is already enrolled in the event
-            UUID eventId = eventEnrollment.getEventId();
+            String eventId = eventEnrollment.getEventId().toString();
             UUID userIdUUID = UUID.fromString(userId);
-            boolean isEnrolled = eventEnrollmentRepo.existsByUserIdAndEventId(userIdUUID, eventId);
+            boolean isEnrolled = eventEnrollmentRepo.existsByUserIdAndEventId(userIdUUID, UUID.fromString(eventId));
             if (isEnrolled) {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("You have already enrolled to this event");
@@ -77,8 +92,22 @@ public class EventEnrollmentService {
             eventEnroll.setPaymentRequired(eventEnrollment.isPaymentRequired());
             eventEnrollmentRepo.save(eventEnroll);
 
+            // Generate QR code and send it via email
+            String encryptedData = encryptDecryptService
+                    .encryptData(userId + "," + eventEnrollment.getEventId().toString());
+            System.out.println("Encrypted data: " + encryptedData);
+
+//            
+
+            String link = "http://localhost:8090/api/scan-qr?encryptedData=" + encryptedData;
+            byte[] qrCodeBytes = qrCodeService.generateQRCode(link);
+            byte[] pdfBytes = pdfService.createPDFFromQRCode(qrCodeBytes);
+
+            // Send the PDF via email
+            qrCodeMailService.sendEmailWithAttachment(pdfBytes, email);
+
             responseMessage.setSuccess(true);
-            responseMessage.setMessage("User Enrolled Successfully");
+            responseMessage.setMessage("User Enrolled Successfully and QR code sent via email");
             return ResponseEntity.ok().body(responseMessage);
         } catch (Exception e) {
             responseMessage.setSuccess(false);
@@ -100,7 +129,7 @@ public class EventEnrollmentService {
         try {
             String email = authService.verifyToken(token);
             String userId = userRepo.findByEmail(email).getId().toString();
-    
+
             UUID userIdUUID = UUID.fromString(userId);
             boolean isEnrolled = eventEnrollmentRepo.existsByUserIdAndEventId(userIdUUID, eventId);
             if (!isEnrolled) {
@@ -108,9 +137,9 @@ public class EventEnrollmentService {
                 responseMessage.setMessage("You have no enrollments for this event");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
-    
+
             eventEnrollmentRepo.deleteByUserIdAndEventId(userIdUUID, eventId);
-    
+
             responseMessage.setSuccess(true);
             responseMessage.setMessage("Enrollment canceled successfully");
             return ResponseEntity.ok().body(responseMessage);
@@ -120,6 +149,5 @@ public class EventEnrollmentService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
     }
-    
 
 }
