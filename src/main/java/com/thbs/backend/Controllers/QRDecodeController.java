@@ -1,6 +1,5 @@
 package com.thbs.backend.Controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thbs.backend.Models.AttendeeList;
+import com.thbs.backend.Models.Event;
 import com.thbs.backend.Models.UserModel;
 import com.thbs.backend.Repositories.AttendeeRepo;
 import com.thbs.backend.Repositories.EventProviderRepo;
@@ -22,7 +22,6 @@ import com.thbs.backend.Repositories.EventRepo;
 import com.thbs.backend.Repositories.UserRepo;
 import com.thbs.backend.Services.AESEncryptionService;
 import com.thbs.backend.Services.AuthService;
-
 
 @RestController
 @RequestMapping("api")
@@ -34,20 +33,22 @@ public class QRDecodeController {
     @Autowired
     private AuthService authService;
 
-
-    @Autowired 
+    @Autowired
     private AttendeeRepo attendeeRepo;
 
     @Autowired
     private UserRepo userRepo;
 
     @Autowired
+    private EventRepo eventRepo;
+
+    @Autowired
     private EventProviderRepo eventProviderRepo;
-    private List<UUID> attendeeIds = new ArrayList<>();
+    
 
     @GetMapping("scan-qr")
     public ResponseEntity<String> scanQRCode(@RequestParam String encryptedData,
-                                             @RequestHeader String token) {
+            @RequestHeader String token) {
         try {
             String email = authService.verifyToken(token);
             UUID organizerId = eventProviderRepo.findByEmail(email).getId();
@@ -69,6 +70,17 @@ public class QRDecodeController {
             String event_id = outputData[1];
             System.out.println("user_id : " + user_id + " event_id : " + event_id);
 
+
+            Event eventFromDB = eventRepo.findByEventId(UUID.fromString(event_id));
+            if (eventFromDB.getEventOrgId()!=organizerId) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Event ID is not valid for the organizer");
+            }
+
+            // List<UUID> eventIds = eventRepo.findEventIdsByOrganizerId(organizerId);
+            // if (!eventIds.contains(UUID.fromString(event_id))) {
+            //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Event ID is not valid for the organizer");
+            // }
+
             Optional<UserModel> userDetails = userRepo.findById(UUID.fromString(user_id));
             if (userDetails.isPresent()) {
                 UserModel user = userDetails.get();
@@ -78,12 +90,10 @@ public class QRDecodeController {
                 attendee.setEmail(user.getEmail());
                 attendee.setEventId(UUID.fromString(event_id));
                 attendeeRepo.save(attendee);
-                // Add attendee to the list or perform other operations as needed
-                // attendeeList.add(attendee);
+
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
-
 
             // Further processing...
 
@@ -96,8 +106,8 @@ public class QRDecodeController {
     }
 
     @GetMapping("/getAttendeeList")
-    public List<UUID> getAttendeeList(@RequestHeader UUID eventId) {
-        return attendeeIds;
+    public List<AttendeeList> getAttendeeList(@RequestHeader UUID eventId) {
+        return attendeeRepo.findByEventId(eventId);
     }
 
 }
