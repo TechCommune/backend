@@ -3,15 +3,17 @@ package com.thbs.backend.Services;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import com.thbs.backend.Models.AdminModel;
 import com.thbs.backend.Models.EmailModel;
 import com.thbs.backend.Models.EventProvider;
+import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Repositories.AdminRepo;
 import com.thbs.backend.Repositories.EventProviderRepo;
 
-import jakarta.validation.constraints.Email;
-
+@Service
 public class EventProviderVerificationService {
     @Autowired
     private EventProviderRepo eventProviderRepo;
@@ -26,9 +28,12 @@ public class EventProviderVerificationService {
     private EmailModel emailModel;
 
     @Autowired
+    private ResponseMessage responseMessage;
+
+    @Autowired
     private AuthService authService;
 
-    public void approveEventProvider(String adminToken, UUID organizerId) {
+    public ResponseEntity<ResponseMessage> approveEventProvider(String adminToken, UUID organizerId) {
         try {
             String email = authService.verifyToken(adminToken);
             AdminModel admin = adminRepo.findByEmail(email);
@@ -48,12 +53,17 @@ public class EventProviderVerificationService {
             eventProvider.setVerificationApproval(true);
             eventProviderRepo.save(eventProvider);
 
+            String response = emailService.sendSimpleMail(emailModel);
+            responseMessage.setSuccess(true);
+            responseMessage.setMessage(response);
+            return ResponseEntity.ok().body(responseMessage);
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to approve event provider: " + e.getMessage());
         }
     }
 
-    public void denyEventProvider(String adminToken, UUID organizerId) {
+    public ResponseEntity<ResponseMessage> denyEventProvider(String adminToken, UUID organizerId) {
         try {
             String email = authService.verifyToken(adminToken);
             AdminModel admin = adminRepo.findByEmail(email);
@@ -72,6 +82,11 @@ public class EventProviderVerificationService {
 
             eventProvider.setVerificationApproval(false);
             eventProviderRepo.save(eventProvider);
+            String response = emailService.sendSimpleMail(emailModel);
+            responseMessage.setSuccess(true);
+            responseMessage.setMessage(response);
+            return ResponseEntity.ok().body(responseMessage);
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to deny event provider: " + e.getMessage());
         }
