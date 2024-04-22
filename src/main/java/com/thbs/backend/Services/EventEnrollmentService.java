@@ -31,8 +31,6 @@ public class EventEnrollmentService {
     @Autowired
     private UserRepo userRepo;
 
-    // @Autowired
-    // private QRCodeEncryptionService encryptionService;
 
     @Autowired
     private AESEncryptionService encryptDecryptService;
@@ -95,7 +93,6 @@ public class EventEnrollmentService {
             // Generate QR code and send it via email
             String encryptedData = encryptDecryptService
                     .encryptData(userId + "," + eventEnrollment.getEventId().toString());
-            System.out.println("Encrypted data: " + encryptedData);
 
 //            
 

@@ -6,15 +6,23 @@ import com.thbs.backend.Models.Event;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import jakarta.transaction.Transactional;
 
 import java.util.UUID;
 
+
+@Repository
 public interface EventRepo extends JpaRepository<Event, UUID> {
 
     Event findByTitle(String title);
 
     Event findByEventId(UUID eventId);
+
+
+    
+
 
     @Transactional
     @Query(value = "SELECT * FROM event_db WHERE event_org_id =:event_org_id AND title =:title", nativeQuery = true)

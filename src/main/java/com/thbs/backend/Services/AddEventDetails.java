@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.thbs.backend.Models.Event;
 import com.thbs.backend.Models.EventDetails;
+import com.thbs.backend.Models.EventProvider;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Repositories.EventProviderRepo;
 import com.thbs.backend.Repositories.EventRepo;
@@ -35,9 +36,17 @@ public class AddEventDetails {
 
         try{
             String email = authService.verifyToken(token);
-            String event_org_id = eventProviderRepo.findByEmail(email).getId().toString();
+            EventProvider eventProvider = eventProviderRepo.findByEmail(email);
+            if(eventProvider == null){
+                throw new RuntimeException("Event Provider not found");
+            }
+            if(!eventProvider.isVerificationApproval()){
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("Admin Approval Pending");
+                return ResponseEntity.ok().body(responseMessage);
+            }
+            String event_org_id = eventProvider.getId().toString();
             String duplicatesMessage = "";
-
 
             for(int i=0;i<eventdetails.size();i++)
             {
