@@ -3,7 +3,6 @@ package com.thbs.backend.Services;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//import javax.swing.ListModel;
 
 import java.time.temporal.ChronoUnit;
 
@@ -204,8 +203,7 @@ public class UserService {
                     ObjectMapper objectMapper = new ObjectMapper();
                     AdminModel admin = objectMapper.convertValue(userOrService,
                             AdminModel.class);
-                    // AdminModel AdminByEmail = adminRepo
-                    //         .findByEmail(admin.getEmail());
+            
 
                     if (adminRepo.count()==0) {
                         admin.setPassword(hashPassword(admin.getPassword()));

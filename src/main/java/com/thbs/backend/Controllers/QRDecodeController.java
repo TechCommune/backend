@@ -54,37 +54,25 @@ public class QRDecodeController {
             UUID organizerId = eventProviderRepo.findByEmail(email).getId();
  
             // Decrypt the QR code data
-            System.out.println("Encrypted data: " + encryptedData); // Debugging
             String encryptedData_without_space = encryptedData.replaceAll(" ", "+");
-            System.out.println(encryptedData_without_space);
             String decryptedData = encryptDecryptService.decryptData(encryptedData_without_space);
  
             if (decryptedData == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to decrypt data");
             }
  
-            System.out.println("Decrypted data: " + decryptedData); // Debugging
  
             String[] outputData = decryptedData.split(",");
             String user_id = outputData[0];
             String event_id = outputData[1];
-            System.out.println("user_id : " + user_id + " event_id : " + event_id);
  
  
             Event eventFromDB = eventRepo.findByEventId(UUID.fromString(event_id));
-            System.out.println("Organizer Id from qr : "+ organizerId);
-            System.out.println("Organizer Id from event db : "+ eventFromDB.getEventOrgId());
-            System.out.println(eventFromDB.getEventOrgId()!=organizerId);
             if (!eventFromDB.getEventOrgId().equals(organizerId)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Event ID is not valid for the organizer");
             }
            
            
- 
-            // List<UUID> eventIds = eventRepo.findEventIdsByOrganizerId(organizerId);
-            // if (!eventIds.contains(UUID.fromString(event_id))) {
-            //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Event ID is not valid for the organizer");
-            // }
  
             Optional<UserModel> userDetails = userRepo.findById(UUID.fromString(user_id));
             if (userDetails.isPresent()) {

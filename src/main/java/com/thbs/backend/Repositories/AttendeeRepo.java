@@ -12,15 +12,7 @@ import java.util.List;
 
 @Repository
 
-public interface AttendeeRepo extends JpaRepository<AttendeeList,UUID>{
-    
-    
-    @Query
-    // ("SELECT al.user_name, e.event_name, al.email " +
-    //        "FROM attendee_list al " +
-    //        "JOIN event_db e ON al.event_id = e.event_id " +
-    //        "WHERE al.event_id = :eventId")
-    // List<Object[]> findAttendeeDetailsByEventId(@Param("eventId") UUID eventId);
+public interface AttendeeRepo extends JpaRepository<AttendeeList, UUID> {
 
     List<AttendeeList> findByEventId(UUID eventId);
 }

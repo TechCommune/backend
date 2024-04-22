@@ -84,9 +84,7 @@ public class ReviewService {
         }
     }
 
-    // public ReviewDetails getReview(UUID eventId) {
-    // return reviewRepo.findByEventId(eventId);
-    // }
+   
     public ResponseEntity<Object> getReview(String eventId) {
         try {
             List<ReviewDetails> fetchedReview = reviewRepo.findByEventId(UUID.fromString(eventId));
