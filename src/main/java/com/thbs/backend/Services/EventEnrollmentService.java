@@ -101,7 +101,7 @@ public class EventEnrollmentService {
             byte[] pdfBytes = pdfService.createPDFFromQRCode(qrCodeBytes);
 
             // Send the PDF via email
-            qrCodeMailService.sendEmailWithAttachment(pdfBytes, email);
+            qrCodeMailService.sendEmailWithAttachment(pdfBytes, email,UUID.fromString(eventId));
 
             responseMessage.setSuccess(true);
             responseMessage.setMessage("User Enrolled Successfully and QR code sent via email");

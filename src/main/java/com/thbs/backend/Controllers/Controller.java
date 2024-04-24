@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,18 +18,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thbs.backend.Models.CoverImageModel;
 import com.thbs.backend.Models.Event;
 import com.thbs.backend.Models.EventDetails;
 import com.thbs.backend.Models.EventEnrollment;
-import com.thbs.backend.Models.ImagesDB;
+import com.thbs.backend.Models.EventProvider;
 import com.thbs.backend.Models.LoginModel;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Models.ReviewDetails;
+import com.thbs.backend.Repositories.EventProviderRepo;
 import com.thbs.backend.Services.AddEventDetails;
 import com.thbs.backend.Services.CoverImageUploadService;
-import com.thbs.backend.Services.DeleteImagesService;
+import com.thbs.backend.Services.DeleteCoverImageService;
 import com.thbs.backend.Services.EventEnrollmentService;
 import com.thbs.backend.Services.EventRating;
+import com.thbs.backend.Services.FetchCoverImage;
 import com.thbs.backend.Services.FetchImages;
 import com.thbs.backend.Services.GetEventAndUpdate;
 import com.thbs.backend.Services.ImageUploadService;
@@ -36,6 +40,8 @@ import com.thbs.backend.Services.ReviewService;
 import com.thbs.backend.Services.UserService;
 
 import jakarta.validation.Valid;
+
+
 
 @RestController
 @RequestMapping("api")
@@ -69,7 +75,13 @@ public class Controller {
     private CoverImageUploadService coverImageUploadService;
 
     @Autowired
-    private DeleteImagesService deleteImagesService;
+    private DeleteCoverImageService deleteCoverImagesService;
+
+    @Autowired
+    private EventProviderRepo eventProviderRepo;
+
+    @Autowired
+    private FetchCoverImage fetchCoverImage;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -196,13 +208,13 @@ public class Controller {
     }
 
     @GetMapping("getimagesforep")
-    public List<ImagesDB> getAllImagesForSP(@RequestHeader String token, @RequestHeader String role) {
-        return fetchImages.fetchImagesService(token, role);
+    public ResponseEntity<Object> getAllImagesForSP(@RequestHeader String adminToken, @RequestHeader UUID organizerId) {
+        return fetchImages.fetchImagesService(adminToken, organizerId);
     }
 
-    @DeleteMapping("deleteimage")
-    public ResponseEntity<ResponseMessage> deleteImage(@RequestBody ImagesDB imageInfo) {
-        return deleteImagesService.deleteImageService(imageInfo);
+    @DeleteMapping("deletecoverimage")
+    public ResponseEntity<ResponseMessage> deleteImage(@RequestBody CoverImageModel imageInfo) {
+        return deleteCoverImagesService.deleteImageService(imageInfo);
     }
 
     @PostMapping("addcoverimage")
@@ -210,6 +222,19 @@ public class Controller {
         
         return coverImageUploadService.uploadCoverImageService(EPToken, event_id,images);
     }
+
+    @GetMapping("getalleventproviders")
+    public ResponseEntity<List<EventProvider>> getAllEventProviders() {
+        List<EventProvider> eventProviders = eventProviderRepo.findAll();
+        return new ResponseEntity<>(eventProviders, HttpStatus.OK);
+    }
+
+    @GetMapping("fetchcoverimage")
+    public ResponseEntity<Object> FetchCoverImage(@RequestHeader UUID organizerId) {
+        return fetchCoverImage.fetchImagesService(organizerId);
+    }
+    
+    
     
 
 }
