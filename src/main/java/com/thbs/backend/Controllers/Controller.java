@@ -27,6 +27,7 @@ import com.thbs.backend.Models.LoginModel;
 import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Models.ReviewDetails;
 import com.thbs.backend.Repositories.EventProviderRepo;
+import com.thbs.backend.Repositories.EventRepo;
 import com.thbs.backend.Services.AddEventDetails;
 import com.thbs.backend.Services.CoverImageUploadService;
 import com.thbs.backend.Services.DeleteCoverImageService;
@@ -40,6 +41,8 @@ import com.thbs.backend.Services.ReviewService;
 import com.thbs.backend.Services.UserService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -67,6 +70,9 @@ public class Controller {
 
     @Autowired
     private EventRating eventRating;
+
+    @Autowired
+    private EventRepo eventRepo;
 
     @Autowired
     private ReviewService reviewService;
@@ -233,6 +239,12 @@ public class Controller {
     public ResponseEntity<Object> FetchCoverImage(@RequestHeader UUID organizerId) {
         return fetchCoverImage.fetchImagesService(organizerId);
     }
+    
+    @GetMapping("getalleventbyorgid")
+    public List<Event> getAllEventsByOrgId(@RequestHeader UUID organizerId) {
+        return eventRepo.findByEventOrgId(organizerId);
+    }
+    
     
     
     
