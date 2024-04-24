@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import jakarta.transaction.Transactional;
 
 import java.util.UUID;
+import java.util.List;
+
 
 
 @Repository
@@ -19,6 +21,7 @@ public interface EventRepo extends JpaRepository<Event, UUID> {
     Event findByTitle(String title);
 
     Event findByEventId(UUID eventId);
+    List<Event> findByEventOrgId(UUID eventOrgId);
 
 
     
