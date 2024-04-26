@@ -35,4 +35,12 @@ public interface EventRepo extends JpaRepository<Event, UUID> {
     @Query(value = "SELECT * FROM event_db WHERE event_org_id =:event_org_id AND event_id =:event_id", nativeQuery = true)
     Event findByEventOrgIdAndEventId(@Param("event_org_id") UUID event_org_id, @Param("event_id") UUID event_id);
 
+
+    List<Event> findByTitleContainingIgnoreCase(String keyword);
+
+    List<Event> findByLocationContainingIgnoreCaseAndModeContainingIgnoreCase(String location , String mode);
+
+    List<Event> findByLocationContainingIgnoreCase(String location);
+
+    List<Event> findByModeContainingIgnoreCase(String mode);
 }
