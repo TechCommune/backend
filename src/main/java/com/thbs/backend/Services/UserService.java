@@ -173,7 +173,7 @@ public class UserService {
                         responseMessage.setSuccess(false);
                         responseMessage.setMessage("User with this email already exists!");
                         responseMessage.setToken(null);
-                        return ResponseEntity.badRequest().body(responseMessage);
+                        return ResponseEntity.ok().body(responseMessage);
                     }
                 }
 
@@ -195,7 +195,7 @@ public class UserService {
                         responseMessage.setSuccess(false);
                         responseMessage.setMessage("User with this email already exists!");
                         responseMessage.setToken(null);
-                        return ResponseEntity.badRequest().body(responseMessage);
+                        return ResponseEntity.ok().body(responseMessage);
                     }
                 }
 
@@ -216,7 +216,7 @@ public class UserService {
                         responseMessage.setSuccess(false);
                         responseMessage.setMessage("Admin already exists!");
                         responseMessage.setToken(null);
-                        return ResponseEntity.badRequest().body(responseMessage);
+                        return ResponseEntity.ok().body(responseMessage);
                     }
                 }
 
@@ -224,13 +224,13 @@ public class UserService {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid Input!");
                     responseMessage.setToken(null);
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
 
             } else {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("Invalid user name or email");
-                return ResponseEntity.badRequest().body(responseMessage);
+                return ResponseEntity.ok().body(responseMessage);
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -253,12 +253,12 @@ public class UserService {
                         responseMessage.setSuccess(false);
                         responseMessage.setMessage("Invalid email or password");
                         responseMessage.setToken(null);
-                        return ResponseEntity.badRequest().body(responseMessage);
+                        return ResponseEntity.ok().body(responseMessage);
                     }
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid email or password");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             } 
             else if (role.equals("admin")){
@@ -275,12 +275,12 @@ public class UserService {
                         responseMessage.setSuccess(false);
                         responseMessage.setMessage("Invalid email or password");
                         responseMessage.setToken(null);
-                        return ResponseEntity.badRequest().body(responseMessage);
+                        return ResponseEntity.ok().body(responseMessage);
                     }
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid email or password");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             }
 
@@ -298,18 +298,18 @@ public class UserService {
                         responseMessage.setSuccess(false);
                         responseMessage.setMessage("Invalid email or password");
                         responseMessage.setToken(null);
-                        return ResponseEntity.badRequest().body(responseMessage);
+                        return ResponseEntity.ok().body(responseMessage);
                     }
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid email or password");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             }
             else {
                 responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid role");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
             }
 
         } catch (Exception e) {
@@ -330,7 +330,7 @@ public class UserService {
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid OTP.");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             } else {
                 if (otpFromDB == otpforTwoFAFromUser) {
@@ -341,7 +341,7 @@ public class UserService {
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid OTP.");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             }
 
@@ -380,7 +380,7 @@ public class UserService {
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid Email");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             } 
             else if (role.equals("eventprovider")) {
@@ -405,13 +405,13 @@ public class UserService {
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid Email");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             } 
             else {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("Invalid role");
-                return ResponseEntity.badRequest().body(responseMessage);
+                return ResponseEntity.ok().body(responseMessage);
             }
             
 
@@ -430,7 +430,7 @@ public class UserService {
             } else {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("Invalid OTP, check your registered Email to get the 6-digit OTP");
-                return ResponseEntity.badRequest().body(responseMessage);
+                return ResponseEntity.ok().body(responseMessage);
             }
         } catch (Exception e) {
             responseMessage.setSuccess(false);
@@ -477,7 +477,7 @@ public class UserService {
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid email");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             } 
             else {
@@ -487,7 +487,7 @@ public class UserService {
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid email");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
             }
            

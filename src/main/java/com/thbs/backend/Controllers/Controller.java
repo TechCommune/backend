@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
+@CrossOrigin(origins="http://localhost:5173")
 @RequestMapping("api")
 public class Controller {
 
@@ -97,7 +99,7 @@ public class Controller {
         return userService.getUserDetailsByEmailService(token, role);
     }
 
-    @GetMapping("login")
+    @PostMapping("login")
     public ResponseEntity<Object> verifyUser(@RequestBody LoginModel loginModel, @RequestHeader String role) {
         return userService.userLoginService(loginModel, role);
     }
@@ -241,6 +243,7 @@ public class Controller {
     public List<Event> getAllEventsByOrgId(@RequestHeader UUID organizerId) {
         return eventRepo.findByEventOrgId(organizerId);
     }
+
 
     @GetMapping("searchevents")
     public List<Event> searchEventsUsingTopicName(@RequestParam String topic) {
