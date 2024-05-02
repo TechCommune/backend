@@ -53,7 +53,7 @@ public class EventRating {
                 } else {
                     responseMessage.setSuccess(false);
                     responseMessage.setMessage("Invalid Event Organizer ID");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
                 }
 
                 return ResponseEntity.status(HttpStatus.OK).body(responseMessage);

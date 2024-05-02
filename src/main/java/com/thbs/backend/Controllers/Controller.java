@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,11 +42,10 @@ import com.thbs.backend.Services.ReviewService;
 import com.thbs.backend.Services.UserService;
 
 import jakarta.validation.Valid;
-
-
-
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
+@CrossOrigin(origins="http://localhost:5173")
 @RequestMapping("api")
 public class Controller {
 
@@ -57,7 +57,7 @@ public class Controller {
 
     @Autowired
     private ImageUploadService imageUploadService;
-    
+
     @Autowired
     private AddEventDetails addEventDetails;
 
@@ -99,7 +99,7 @@ public class Controller {
         return userService.getUserDetailsByEmailService(token, role);
     }
 
-    @GetMapping("login")
+    @PostMapping("login")
     public ResponseEntity<Object> verifyUser(@RequestBody LoginModel loginModel, @RequestHeader String role) {
         return userService.userLoginService(loginModel, role);
     }
@@ -195,14 +195,13 @@ public class Controller {
     }
 
     @PutMapping("updatereview")
-    public ResponseEntity<ResponseMessage> updateReview(@RequestHeader String token, @RequestBody ReviewDetails reviewDetails)
-    {
+    public ResponseEntity<ResponseMessage> updateReview(@RequestHeader String token,
+            @RequestBody ReviewDetails reviewDetails) {
         return reviewService.updateReview(token, reviewDetails);
     }
 
     @DeleteMapping("deletereview")
-    public ResponseEntity<ResponseMessage> deleteReview(@RequestHeader String token,@RequestHeader UUID reviewId)
-    {
+    public ResponseEntity<ResponseMessage> deleteReview(@RequestHeader String token, @RequestHeader UUID reviewId) {
         return reviewService.deleteReview(token, reviewId);
     }
 
@@ -223,9 +222,10 @@ public class Controller {
     }
 
     @PostMapping("addcoverimage")
-    public ResponseEntity<ResponseMessage> AddCoverImageForEvent(@RequestHeader String EPToken , @RequestHeader UUID event_id , @RequestBody MultipartFile images ) {
-        
-        return coverImageUploadService.uploadCoverImageService(EPToken, event_id,images);
+    public ResponseEntity<ResponseMessage> AddCoverImageForEvent(@RequestHeader String EPToken,
+            @RequestHeader UUID event_id, @RequestBody MultipartFile images) {
+
+        return coverImageUploadService.uploadCoverImageService(EPToken, event_id, images);
     }
 
     @GetMapping("getalleventproviders")
@@ -238,14 +238,28 @@ public class Controller {
     public ResponseEntity<Object> FetchCoverImage(@RequestHeader UUID organizerId) {
         return fetchCoverImage.fetchImagesService(organizerId);
     }
-    
+
     @GetMapping("getalleventbyorgid")
     public List<Event> getAllEventsByOrgId(@RequestHeader UUID organizerId) {
         return eventRepo.findByEventOrgId(organizerId);
     }
-    
-    
-    
-    
+
+    @GetMapping("searchevents")
+    public List<Event> searchEventsUsingTopicName(@RequestParam String topic) {
+        return eventRepo.findByTitleContainingIgnoreCase(topic);
+    }
+
+    @GetMapping("filterevents")
+    public List<Event> filterEvents(@RequestParam String location, @RequestParam String mode) {
+        if (location != null && mode != null) {
+            return eventRepo.findByLocationContainingIgnoreCaseAndModeContainingIgnoreCase(location, mode);
+        } else if (location != null) {
+            return eventRepo.findByLocationContainingIgnoreCase(location);
+        } else if (mode != null) {
+            return eventRepo.findByModeContainingIgnoreCase(mode);
+        } else {
+            return eventRepo.findAll();
+        }
+    }
 
 }

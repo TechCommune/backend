@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import com.thbs.backend.Models.EventEnrollment;
 import com.thbs.backend.Repositories.EventEnrollRepo;
 import com.thbs.backend.Services.EventProviderVerificationService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
+
 @RequestMapping("/admin")
 public class AdminController {
 

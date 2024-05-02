@@ -91,6 +91,8 @@ public class GetEventAndUpdate {
 
     }
 
+    
+
     public ResponseEntity<ResponseMessage> deleteEvent(String token, String role, UUID eventId) {
         try {
 
