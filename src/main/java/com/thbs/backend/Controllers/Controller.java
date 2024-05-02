@@ -244,6 +244,7 @@ public class Controller {
         return eventRepo.findByEventOrgId(organizerId);
     }
 
+
     @GetMapping("searchevents")
     public List<Event> searchEventsUsingTopicName(@RequestParam String topic) {
         return eventRepo.findByTitleContainingIgnoreCase(topic);
