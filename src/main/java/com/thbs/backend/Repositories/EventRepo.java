@@ -43,4 +43,6 @@ public interface EventRepo extends JpaRepository<Event, UUID> {
     List<Event> findByLocationContainingIgnoreCase(String location);
 
     List<Event> findByModeContainingIgnoreCase(String mode);
+
 }
+
