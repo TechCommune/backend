@@ -335,7 +335,7 @@ public class UserService {
             } else {
                 if (otpFromDB == otpforTwoFAFromUser) {
                     responseMessage.setSuccess(true);
-                    responseMessage.setMessage("Login Successfully!");
+                    responseMessage.setMessage("Logged In Successfully!");
                     responseMessage.setToken(authService.generateToken(email));
                     return ResponseEntity.ok().body(responseMessage);
                 } else {
