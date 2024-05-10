@@ -50,7 +50,7 @@ public class EventProviderVerificationService {
             emailModel.setMsgBody("Hi,\n\n" +
                     "We are pleased to inform you that your document verification has been successful. You are now approved to create events.");
 
-            eventProvider.setVerificationApproval(true);
+            eventProvider.setVerificationApproval("Approved");
             eventProviderRepo.save(eventProvider);
 
             String response = emailService.sendSimpleMail(emailModel);
@@ -80,7 +80,7 @@ public class EventProviderVerificationService {
             emailModel.setMsgBody("Hi,\n\n" +
                     "We regret to inform you that your document verification has been unsuccessful. As a result, you are not approved to create events at this time. ");
 
-            eventProvider.setVerificationApproval(false);
+            eventProvider.setVerificationApproval("Denied");
             eventProviderRepo.save(eventProvider);
             String response = emailService.sendSimpleMail(emailModel);
             responseMessage.setSuccess(true);

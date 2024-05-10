@@ -16,6 +16,7 @@ public interface EventProviderRepo extends JpaRepository <EventProvider,UUID>{
     EventProvider findByEmail(String email);
     Optional<EventProvider> findById(UUID id);
     List<EventProvider> findAll();
+    List<EventProvider> findByVerificationApproval(String verificationApproval);
 
     
    
