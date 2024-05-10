@@ -234,6 +234,13 @@ public class Controller {
         return new ResponseEntity<>(eventProviders, HttpStatus.OK);
     }
 
+    @GetMapping("getunapprovedeventproviders")
+    public ResponseEntity<List<EventProvider>> getUnApprovedEventProviders() {
+        List <EventProvider> eventProviders = eventProviderRepo.findByVerificationApproval("Pending");
+        return new ResponseEntity<>(eventProviders, HttpStatus.OK);
+    }
+    
+
     @GetMapping("fetchcoverimage")
     public ResponseEntity<Object> FetchCoverImage(@RequestHeader UUID organizerId) {
         return fetchCoverImage.fetchImagesService(organizerId);

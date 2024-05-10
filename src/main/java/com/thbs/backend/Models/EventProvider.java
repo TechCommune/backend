@@ -39,8 +39,8 @@ public class EventProvider {
     @NotNull
     private long phoneNumber;
 
-    @Column(columnDefinition = "boolean default false")
-    private boolean verificationApproval;
+    @Column(columnDefinition = "String default Pending")
+    private String verificationApproval;
 
 
 }
