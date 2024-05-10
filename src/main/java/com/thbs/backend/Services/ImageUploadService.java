@@ -1,5 +1,6 @@
 package com.thbs.backend.Services;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,6 +60,7 @@ public class ImageUploadService {
 
                 if (messageFromPutObjectService.getSuccess()) {
                     imagesDB.setImageURL(messageFromPutObjectService.getMessage());
+                    imagesDB.setDateOfGenration(LocalDate.now());
                     imagesDBRepo.save(imagesDB);
                 } else {
                     failedImages += images.get(i).getOriginalFilename();

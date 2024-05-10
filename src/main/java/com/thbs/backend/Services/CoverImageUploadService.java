@@ -1,5 +1,6 @@
 package com.thbs.backend.Services;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -97,6 +98,7 @@ public class CoverImageUploadService {
             coverImageModel.setImageURL(s3PutObjectService.preSignedURLService(organizerId.toString(), key).getBody().getMessage());
             coverImageModel.setOrganizerId(organizerId);
             coverImageModel.setEventId(eventId);
+            coverImageModel.setDateOfGenration(LocalDate.now());
 
             coverImageRepo.save(coverImageModel);
 

@@ -1,5 +1,5 @@
 package com.thbs.backend.Models;
-
+import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -17,4 +17,6 @@ public class ImagesDB {
     private String imageURL;
 
     private UUID organizerId;
+
+    private LocalDate dateOfGenration;
 }

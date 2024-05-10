@@ -1,13 +1,19 @@
 package com.thbs.backend.Services;
 
 import java.time.Duration;
-
+import java.time.LocalDate;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thbs.backend.Models.CoverImageModel;
+import com.thbs.backend.Models.ImagesDB;
 import com.thbs.backend.Models.ResponseMessage;
+import com.thbs.backend.Repositories.CoverImageRepo;
+import com.thbs.backend.Repositories.ImagesDBRepo;
 import com.thbs.backend.StaticData.S3Data;
 
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -25,6 +31,54 @@ public class S3PutObjectService {
 
     @Autowired
     private ResponseMessage responseMessage;
+
+    @Autowired
+    private ImagesDBRepo imagesDBRepo;
+
+    @Autowired
+    private CoverImageRepo coverImageRepo;
+
+    @Scheduled(fixedRate = 86400000)
+    public void deleteExpiredEPRecords() {
+        LocalDate expiryTime = LocalDate.now();
+        List<ImagesDB> imagesFromDB = imagesDBRepo.findAll();
+        String folderName = System.getenv("FOLDER_FOR_SERVICE_PROVIDER_IMAGES");
+
+        for (int i = 0; i < imagesFromDB.size(); i++) {
+
+            if(imagesFromDB.get(i).getDateOfGenration().isBefore(expiryTime))
+            {
+                String key = folderName + '/' + imagesFromDB.get(i).getOrganizerId() + '/' + imagesFromDB.get(i).getImageId();
+                ResponseEntity<ResponseMessage> newPresignedURL = preSignedURLService(
+                        imagesFromDB.get(i).getOrganizerId().toString(), key);
+                imagesFromDB.get(i).setImageURL(newPresignedURL.getBody().getMessage());
+                imagesFromDB.get(i).setDateOfGenration(LocalDate.now());
+                imagesDBRepo.save(imagesFromDB.get(i));
+            }            
+
+        }
+    }
+
+    @Scheduled(fixedRate = 86400000)
+    public void deleteExpiredEventRecords() {
+        LocalDate expiryTime = LocalDate.now();
+        List<CoverImageModel> coverimagesFromDB = coverImageRepo.findAll();
+        String folderName = System.getenv("FOLDER_FOR_EVENTS");
+
+        for (int i = 0; i < coverimagesFromDB.size(); i++) {
+
+            if(coverimagesFromDB.get(i).getDateOfGenration().isBefore(expiryTime))
+            {
+                String key = folderName + '/' + coverimagesFromDB.get(i).getEventId() + '/' + coverimagesFromDB.get(i).getCoverImageId();
+                ResponseEntity<ResponseMessage> newPresignedURL = preSignedURLService(
+                        coverimagesFromDB.get(i).getOrganizerId().toString(), key);
+                coverimagesFromDB.get(i).setImageURL(newPresignedURL.getBody().getMessage());
+                coverimagesFromDB.get(i).setDateOfGenration(LocalDate.now());
+                coverImageRepo.save(coverimagesFromDB.get(i));
+            }            
+
+        }
+    }
 
     public boolean checkObjectInBucket(String bucketName, String key) {
         S3Client s3Client = S3Data.s3Client;
@@ -54,7 +108,7 @@ public class S3PutObjectService {
                         .build();
 
                 GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                        .signatureDuration(Duration.ofHours(10))
+                        .signatureDuration(Duration.ofHours(12))
                         .getObjectRequest(request)
                         .build();
 

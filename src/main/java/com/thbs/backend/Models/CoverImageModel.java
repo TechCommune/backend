@@ -1,5 +1,6 @@
 package com.thbs.backend.Models;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -24,4 +25,6 @@ public class CoverImageModel {
     private UUID organizerId;
 
     private UUID eventId;
+
+    private LocalDate dateOfGenration;
 }
