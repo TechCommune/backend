@@ -117,6 +117,20 @@ public class EventEnrollmentService {
         return eventEnrollmentRepo.findByUserId(userId);
     }
 
+    public List<EventEnrollment> getEnrollmentsByToken(String token) {
+        try {
+            if (token == null || token.isEmpty()) {
+                throw new RuntimeException("Token is missing");
+            }
+            String email = authService.verifyToken(token);
+            String verifiedUserId = userRepo.findByEmail(email).getId().toString();
+            return eventEnrollmentRepo.findByUserId(UUID.fromString(verifiedUserId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; 
+        }
+    }
+
     public List<EventEnrollment> getEnrollmentsByEventId(UUID eventId) {
         return eventEnrollmentRepo.findByEventId(eventId);
     }

@@ -45,7 +45,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("api")
 public class Controller {
 
@@ -244,7 +244,6 @@ public class Controller {
         return eventRepo.findByEventOrgId(organizerId);
     }
 
-
     @GetMapping("searchevents")
     public List<Event> searchEventsUsingTopicName(@RequestParam String topic) {
         return eventRepo.findByTitleContainingIgnoreCase(topic);
@@ -263,4 +262,9 @@ public class Controller {
         }
     }
 
+    @GetMapping("getenrollmentsbytoken")
+    public List<EventEnrollment> getEnrolls(@RequestHeader String token) {
+        return enrollmentService.getEnrollmentsByToken(token);
+
+    }
 }
