@@ -1,8 +1,10 @@
 package com.thbs.backend.Controllers;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.thbs.backend.Models.CoverImageModel;
 import com.thbs.backend.Models.Event;
 import com.thbs.backend.Models.EventDetails;
+import com.thbs.backend.Models.EventDetailsDTO;
 import com.thbs.backend.Models.EventEnrollment;
 import com.thbs.backend.Models.EventProvider;
 import com.thbs.backend.Models.LoginModel;
@@ -273,5 +276,14 @@ public class Controller {
     public List<EventEnrollment> getEnrolls(@RequestHeader String token) {
         return enrollmentService.getEnrollmentsByToken(token);
 
+    }
+
+     @GetMapping("/completed")
+    public List<EventDetailsDTO> getCompletedEventsWithMaxCapacity(@RequestHeader UUID organizerId) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        List<Event> completedEvents = eventRepo.findByEventOrgIdAndEndTimeBefore(organizerId , currentDateTime);
+        return completedEvents.stream()
+                .map(event -> new EventDetailsDTO(event, event.getMaxCapacity()))
+                .collect(Collectors.toList());
     }
 }

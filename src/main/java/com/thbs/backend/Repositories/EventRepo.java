@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import jakarta.transaction.Transactional;
 
 import java.util.UUID;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -44,5 +45,6 @@ public interface EventRepo extends JpaRepository<Event, UUID> {
 
     List<Event> findByModeContainingIgnoreCase(String mode);
 
+    List<Event> findByEventOrgIdAndEndTimeBefore(UUID eventOrgId, LocalDateTime dateTime);
 }
 
