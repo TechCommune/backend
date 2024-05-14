@@ -61,7 +61,7 @@ public class ReviewService {
             if (!isEnrolled) {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("You need to enroll in the event before writing a review");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+                return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
             }
 
             ReviewDetails reviewProvided = new ReviewDetails();

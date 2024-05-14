@@ -72,7 +72,7 @@ public class QRDecodeController {
  
             Event eventFromDB = eventRepo.findByEventId(UUID.fromString(event_id));
             if (!eventFromDB.getEventOrgId().equals(organizerId)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Event ID is not valid for the organizer");
+                return ResponseEntity.status(HttpStatus.OK).body("Event ID is not valid for the organizer");
             }
            
            
