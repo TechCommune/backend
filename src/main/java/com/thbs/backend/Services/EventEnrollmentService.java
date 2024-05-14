@@ -59,7 +59,7 @@ public class EventEnrollmentService {
             if (isEnrolled) {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("You have already enrolled to this event");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+                return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
             }
 
             // Check if the event exists
@@ -76,7 +76,7 @@ public class EventEnrollmentService {
             if (enrolledUsers >= maxCapacity) {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("Event has reached maximum capacity");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                return ResponseEntity.status(HttpStatus.OK)
                         .body(responseMessage);
             }
 
@@ -146,7 +146,7 @@ public class EventEnrollmentService {
             if (!isEnrolled) {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("You have no enrollments for this event");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+                return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
             }
 
             eventEnrollmentRepo.deleteByUserIdAndEventId(userIdUUID, eventId);
