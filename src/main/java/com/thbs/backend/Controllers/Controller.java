@@ -286,4 +286,10 @@ public class Controller {
                 .map(event -> new EventDetailsDTO(event, event.getMaxCapacity()))
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/upcoming")
+    public List<Event> getUpcomingEvents(@RequestHeader UUID organizerId) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        return eventRepo.findByEventOrgIdAndStartTimeAfter(organizerId , currentDateTime);
+    }
 }
