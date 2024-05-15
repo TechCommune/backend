@@ -292,4 +292,10 @@ public class Controller {
         LocalDateTime currentDateTime = LocalDateTime.now();
         return eventRepo.findByEventOrgIdAndStartTimeAfter(organizerId , currentDateTime);
     }
+
+    @GetMapping("eventcoverimage")
+    public ResponseEntity<Object> FetchImageByEventId(@RequestHeader UUID eventId) {
+        return fetchCoverImage.fetchImageByEventId(eventId);
+    }
+
 }

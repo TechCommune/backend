@@ -30,4 +30,16 @@ public class FetchCoverImage {
         }
     }
 
+    public ResponseEntity<Object> fetchImageByEventId(UUID eventId)
+    {
+        try{
+            List<CoverImageModel> images = coverImageRepo.findByEventId(eventId);
+            return ResponseEntity.ok(images);
+        }
+        catch(Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
+    }
+
 }
