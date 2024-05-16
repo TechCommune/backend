@@ -75,7 +75,7 @@ public class AddEventDetails {
                 return ResponseEntity.ok().body(responseMessage);
             } else {
                 responseMessage.setSuccess(false);
-                responseMessage.setMessage("Event registered successfully but these " + duplicatesMessage
+                responseMessage.setMessage("Event Title " + duplicatesMessage
                         + " already exists, hence not been added.");
                 return ResponseEntity.ok().body(responseMessage);
             }
