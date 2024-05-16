@@ -248,6 +248,7 @@ public class Controller {
     public ResponseEntity<Object> FetchCoverImage(@RequestHeader UUID organizerId) {
         return fetchCoverImage.fetchImagesService(organizerId);
     }
+    
 
     @GetMapping("getalleventbyorgid")
     public List<Event> getAllEventsByOrgId(@RequestHeader UUID organizerId) {
@@ -290,7 +291,7 @@ public class Controller {
     @GetMapping("/upcoming")
     public List<Event> getUpcomingEvents(@RequestHeader UUID organizerId) {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        return eventRepo.findByEventOrgIdAndStartTimeAfter(organizerId , currentDateTime);
+        return eventRepo.findByEventOrgIdAndStartTimeAfterOrderByStartTimeAsc(organizerId , currentDateTime);
     }
 
     @GetMapping("eventcoverimage")
