@@ -2,7 +2,7 @@ package com.thbs.backend.Controllers;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -298,5 +299,11 @@ public class Controller {
     public ResponseEntity<Object> FetchImageByEventId(@RequestHeader UUID eventId) {
         return fetchCoverImage.fetchImageByEventId(eventId);
     }
+     @GetMapping("/getEPDetailsById")
+    public Optional<EventProvider> getUsernameById(@RequestHeader UUID id) {
+        return eventProviderRepo.findById(id);
+         }
+
+  
 
 }
