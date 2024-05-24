@@ -70,6 +70,7 @@ public class ReviewService {
             reviewProvided.setUserId(reviewDetails.getUserId());
             reviewProvided.setUserName(reviewDetails.getUserName());
             reviewProvided.setReview(reviewDetails.getReview());
+            reviewProvided.setRating(reviewDetails.getRating());
             // Save the review to the database
             reviewRepo.save(reviewProvided);
 

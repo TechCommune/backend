@@ -24,4 +24,5 @@ public class ReviewDetails {
 
     private String review;
 
+    private float rating;
 }
