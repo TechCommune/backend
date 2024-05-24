@@ -21,7 +21,7 @@ public class EventProvider {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "organizer_id")
+    @Column(name = "organizer_id", columnDefinition = "BINARY(16)")
     private UUID id;
 
     @NotNull
@@ -39,8 +39,6 @@ public class EventProvider {
     @NotNull
     private long phoneNumber;
 
-    @Column(columnDefinition = "String default Pending")
+    @Column(columnDefinition = "VARCHAR(255) DEFAULT 'Pending'")
     private String verificationApproval;
-
-
 }
