@@ -177,15 +177,36 @@ public class UserService {
                     }
                 }
 
+                // else if (role.equals("eventprovider")) {
+                //     ObjectMapper objectMapper = new ObjectMapper();
+                //     EventProvider eventProvider = objectMapper.convertValue(userOrService,
+                //             EventProvider.class);
+                //     EventProvider eventProvierByEmail = eventProviderRepo
+                //             .findByEmail(eventProvider.getEmail());
+
+                //     if (eventProvierByEmail == null) {
+                //         eventProvider.setPassword(hashPassword(eventProvider.getPassword()));
+                //         eventProviderRepo.save(eventProvider);
+                //         responseMessage.setSuccess(true);
+                //         responseMessage.setMessage("Account Created Successfully!");
+                //         responseMessage.setToken(authService.generateToken(eventProvider.getEmail()));
+                //         return ResponseEntity.ok().body(responseMessage);
+                //     } else {
+                //         responseMessage.setSuccess(false);
+                //         responseMessage.setMessage("User with this email already exists!");
+                //         responseMessage.setToken(null);
+                //         return ResponseEntity.ok().body(responseMessage);
+                //     }
+                // }
+
                 else if (role.equals("eventprovider")) {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    EventProvider eventProvider = objectMapper.convertValue(userOrService,
-                            EventProvider.class);
-                    EventProvider eventProvierByEmail = eventProviderRepo
-                            .findByEmail(eventProvider.getEmail());
-
+                    EventProvider eventProvider = objectMapper.convertValue(userOrService, EventProvider.class);
+                    EventProvider eventProvierByEmail = eventProviderRepo.findByEmail(eventProvider.getEmail());
+                
                     if (eventProvierByEmail == null) {
                         eventProvider.setPassword(hashPassword(eventProvider.getPassword()));
+                        eventProvider.setVerificationApproval("Pending"); // Ensure default value
                         eventProviderRepo.save(eventProvider);
                         responseMessage.setSuccess(true);
                         responseMessage.setMessage("Account Created Successfully!");
@@ -198,6 +219,7 @@ public class UserService {
                         return ResponseEntity.ok().body(responseMessage);
                     }
                 }
+                
 
                 else if (role.equals("admin")) {
                     ObjectMapper objectMapper = new ObjectMapper();
