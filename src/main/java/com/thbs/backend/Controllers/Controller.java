@@ -2,6 +2,7 @@ package com.thbs.backend.Controllers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,7 @@ import com.thbs.backend.Models.ResponseMessage;
 import com.thbs.backend.Models.ReviewDetails;
 import com.thbs.backend.Repositories.EventProviderRepo;
 import com.thbs.backend.Repositories.EventRepo;
+import com.thbs.backend.Repositories.ReviewRepo;
 import com.thbs.backend.Services.AddEventDetails;
 import com.thbs.backend.Services.CoverImageUploadService;
 import com.thbs.backend.Services.DeleteCoverImageService;
@@ -90,6 +93,9 @@ public class Controller {
 
     @Autowired
     private FetchCoverImage fetchCoverImage;
+
+    @Autowired
+    private ReviewRepo reviewRepo;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -303,6 +309,11 @@ public class Controller {
         return eventProviderRepo.findById(id);
          }
 
-  
+     
+         @GetMapping("rating-summary")
+         public Map<String, Object> getEventRatingSummary(@RequestHeader UUID eventId) {
+            return reviewRepo.findEventRatingSummary(eventId);
+
+         }
 
 }
