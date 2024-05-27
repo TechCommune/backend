@@ -315,5 +315,10 @@ public class Controller {
             return reviewRepo.findEventRatingSummary(eventId);
 
          }
+         @GetMapping("resendOtp")
+         public ResponseEntity<Object> resendOtp(@RequestHeader String email) {
+            return userService.resendOTP(email);
+
+         }
 
 }
