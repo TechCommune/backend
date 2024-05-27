@@ -259,13 +259,34 @@ public class UserService {
                     .body("Internal Server Error!");
         }
     }
-
+    
+    public ResponseEntity<Object> resendOTP(String email) {
+        try {
+            UserModel userModel = userRepo.findByEmail(email);
+            if (userModel != null) {
+                generateOTPforTwoFAService(userModel);
+                responseMessage.setSuccess(true);
+                responseMessage.setMessage("OTP has been resent successfully.");
+                return ResponseEntity.ok().body(responseMessage);
+            } else {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("User not found with the provided email.");
+                return ResponseEntity.ok().body(responseMessage);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Internal Server Error!");
+        }
+    }
+    
     public ResponseEntity<Object> userLoginService(LoginModel loginModel, String role) {
         try {
             if (role.equals("user")) {
                 UserModel userModel = userRepo.findByEmail(loginModel.getEmail());
+                System.out.println(userModel);
                 if (userModel != null) {
                     if (BCrypt.checkpw(loginModel.getPassword(), userModel.getPassword())) {
+                        System.out.println("inside if");
                         responseMessage.setSuccess(true);
                         responseMessage.setMessage("Logged in Successfully!");
                         responseMessage.setToken(null);
@@ -414,6 +435,38 @@ public class UserService {
                     otpForForgotPassword.setOtp(otp);
                     otpForForgotPassword.setUseCase("forgotpassword");
                     otpForForgotPassword.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
+
+                    otpRepo.save(otpForForgotPassword);
+
+                    emailModel.setRecipient(email);
+                    emailModel.setSubject("OTP for Resetting your password");
+                    emailModel.setMsgBody("Your OTP for resetting your password is " + Integer.toString(otp)
+                            + ". It is valid only for 5 minutes.");
+
+                    String response = emailService.sendSimpleMail(emailModel);
+                    responseMessage.setSuccess(true);
+                    responseMessage.setMessage(response);
+                    return ResponseEntity.ok().body(responseMessage);
+                } else {
+                    responseMessage.setSuccess(false);
+                    responseMessage.setMessage("Invalid Email");
+                    return ResponseEntity.ok().body(responseMessage);
+                }
+            } 
+            else if (role.equals("admin")) {
+                AdminModel admin = adminRepo.findByEmail(email);
+                if (admin != null) {
+                    int otp = OTPGenerator.generateRandom6DigitNumber();
+                    OTPModel otpForForgotPassword = new OTPModel();
+                    otpForForgotPassword.setEmail(email);
+                    otpForForgotPassword.setOtp(otp);
+                    otpForForgotPassword.setUseCase("forgotpassword");
+                    otpForForgotPassword.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
+
+                    System.out.println(otpForForgotPassword);
+
+                    otpRepo.save(otpForForgotPassword);
+
 
                     emailModel.setRecipient(email);
                     emailModel.setSubject("OTP for Resetting your password");
