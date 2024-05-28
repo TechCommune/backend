@@ -316,10 +316,8 @@ public class UserService {
         try {
             if (role.equals("user")) {
                 UserModel userModel = userRepo.findByEmail(loginModel.getEmail());
-                System.out.println(userModel);
                 if (userModel != null) {
                     if (BCrypt.checkpw(loginModel.getPassword(), userModel.getPassword())) {
-                        System.out.println("inside if");
                         responseMessage.setSuccess(true);
                         responseMessage.setMessage("Logged in Successfully!");
                         responseMessage.setToken(null);
@@ -496,7 +494,6 @@ public class UserService {
                     otpForForgotPassword.setUseCase("forgotpassword");
                     otpForForgotPassword.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
 
-                    System.out.println(otpForForgotPassword);
 
                     otpRepo.save(otpForForgotPassword);
 
