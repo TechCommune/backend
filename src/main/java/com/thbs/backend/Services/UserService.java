@@ -260,9 +260,10 @@ public class UserService {
         }
     }
     
-    public ResponseEntity<Object> resendOTP(String email) {
+    public ResponseEntity<Object> resendOTP(String email,String role) {
         try {
-            UserModel userModel = userRepo.findByEmail(email);
+           if(role.equals("user"))
+           { UserModel userModel = userRepo.findByEmail(email);
             if (userModel != null) {
                 generateOTPforTwoFAService(userModel);
                 responseMessage.setSuccess(true);
@@ -271,6 +272,38 @@ public class UserService {
             } else {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("User not found with the provided email.");
+                return ResponseEntity.ok().body(responseMessage);
+            }}
+            else if(role.equals("admin")){
+                AdminModel adminModel = adminRepo.findByEmail(email);
+            if (adminModel != null) {
+                generateOTPforTwoFAServiceAdmin(adminModel);
+                responseMessage.setSuccess(true);
+                responseMessage.setMessage("OTP has been resent successfully.");
+                return ResponseEntity.ok().body(responseMessage);
+            } else {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("User not found with the provided email.");
+                return ResponseEntity.ok().body(responseMessage);
+            }
+            }
+            else if(role.equals("eventprovider"))
+            {
+                EventProvider epModel = eventProviderRepo.findByEmail(email);
+            if (epModel != null) {
+                generateOTPforTwoFAServiceProviderService(epModel);
+                responseMessage.setSuccess(true);
+                responseMessage.setMessage("OTP has been resent successfully.");
+                return ResponseEntity.ok().body(responseMessage);
+            } else {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("User not found with the provided email.");
+                return ResponseEntity.ok().body(responseMessage);
+            }
+            }
+            else{
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("Invalid Role.");
                 return ResponseEntity.ok().body(responseMessage);
             }
         } catch (Exception e) {
