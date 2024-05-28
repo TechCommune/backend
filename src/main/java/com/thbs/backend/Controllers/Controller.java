@@ -316,8 +316,8 @@ public class Controller {
 
          }
          @GetMapping("resendOtp")
-         public ResponseEntity<Object> resendOtp(@RequestHeader String email) {
-            return userService.resendOTP(email);
+         public ResponseEntity<Object> resendOtp(@RequestHeader String email,@RequestHeader String role) {
+            return userService.resendOTP(email,role);
 
          }
 
