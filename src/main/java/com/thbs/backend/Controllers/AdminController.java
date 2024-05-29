@@ -13,7 +13,7 @@ import com.thbs.backend.Repositories.EventEnrollRepo;
 import com.thbs.backend.Services.EventProviderVerificationService;
 
 @RestController
-@CrossOrigin(origins = "http://3.111.246.82:5173")
+@CrossOrigin(origins = "http://localhost:5173")
 
 @RequestMapping("/admin")
 public class AdminController {
