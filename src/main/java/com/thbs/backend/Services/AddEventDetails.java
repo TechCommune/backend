@@ -24,12 +24,10 @@ public class AddEventDetails {
     private EventRepo eventRepo;
 
     @Autowired
-    private ResponseMessage responseMessage;
-
-    @Autowired
     private AuthService authService;
 
     public ResponseEntity<ResponseMessage> addEvent(List<EventDetails> eventdetails, String token, String role) {
+        ResponseMessage responseMessage = new ResponseMessage();
 
         try {
             String email = authService.verifyToken(token);
@@ -37,48 +35,46 @@ public class AddEventDetails {
             if (eventProvider == null) {
                 throw new RuntimeException("Event Provider not found");
             }
-            if (eventProvider.getVerificationApproval().equals("Denied")
-                    || eventProvider.getVerificationApproval().equals("Pending")) {
+            if ("Denied".equals(eventProvider.getVerificationApproval()) || "Pending".equals(eventProvider.getVerificationApproval())) {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("Admin Approval Pending");
                 return ResponseEntity.ok().body(responseMessage);
             }
-            String event_org_id = eventProvider.getId().toString();
-            String duplicatesMessage = "";
+            String eventOrgId = eventProvider.getId().toString();
+            StringBuilder duplicatesMessage = new StringBuilder();
 
-            for (int i = 0; i < eventdetails.size(); i++) {
-                Event eventExistence = eventRepo.findByEventOrgIdAndEventTitle(UUID.fromString(event_org_id),
-                        eventdetails.get(i).getTitle());
-
-                Event event = new Event();
+            for (EventDetails eventDetail : eventdetails) {
+                Event eventExistence = eventRepo.findByEventOrgIdAndEventTitle(UUID.fromString(eventOrgId), eventDetail.getTitle());
 
                 if (eventExistence == null) {
-                    event.setEventOrgId(UUID.fromString(event_org_id));
-                    event.setTitle(eventdetails.get(i).getTitle());
-                    event.setDescription(eventdetails.get(i).getDescription());
-                    event.setLocation(eventdetails.get(i).getLocation());
-                    event.setMode(eventdetails.get(i).getMode());
-                    event.setStartTime(eventdetails.get(i).getStartTime());
-                    event.setEndTime(eventdetails.get(i).getEndTime());
-                    event.setMaxCapacity(eventdetails.get(i).getMaxCapacity());
-                    event.setPrice(eventdetails.get(i).getPrice());
-                    event.setPaymentRequired(eventdetails.get(i).isPaymentRequired());
+                    Event event = new Event();
+                    event.setEventOrgId(UUID.fromString(eventOrgId));
+                    event.setTitle(eventDetail.getTitle());
+                    event.setDescription(eventDetail.getDescription());
+                    event.setLocation(eventDetail.getLocation());
+                    event.setMode(eventDetail.getMode());
+                    event.setStartTime(eventDetail.getStartTime());
+                    event.setEndTime(eventDetail.getEndTime());
+                    event.setMaxCapacity(eventDetail.getMaxCapacity());
+                    event.setPrice(eventDetail.getPrice());
+                    event.setPaymentRequired(eventDetail.isPaymentRequired());
                     eventRepo.save(event);
-                } else {
-                    duplicatesMessage += eventRepo.findByTitle(eventdetails.get(i).getTitle()).getTitle();
-                    duplicatesMessage += ", ";
+                } else if (eventExistence.getTitle().equals(eventDetail.getTitle())) {
+                    // Event exists with the same exact title
+                    duplicatesMessage.append(eventDetail.getTitle()).append(", ");
                 }
             }
+
             if (duplicatesMessage.length() == 0) {
                 responseMessage.setSuccess(true);
                 responseMessage.setMessage("Event registered successfully");
-                return ResponseEntity.ok().body(responseMessage);
             } else {
                 responseMessage.setSuccess(false);
-                responseMessage.setMessage("Event Title " + duplicatesMessage
-                        + " already exists, hence not been added.");
-                return ResponseEntity.ok().body(responseMessage);
+                // Remove the trailing comma and space
+                duplicatesMessage.setLength(duplicatesMessage.length() - 2);
+                responseMessage.setMessage("Event Title(s): " + duplicatesMessage.toString() + " already exist(s), hence not been added.");
             }
+            return ResponseEntity.ok().body(responseMessage);
 
         } catch (Exception e) {
             responseMessage.setSuccess(false);
