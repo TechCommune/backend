@@ -93,7 +93,7 @@ public class QRDecodeController {
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
-            return ResponseEntity.ok(userName + " attended");
+            return ResponseEntity.ok(userName + " added to the attendee list");
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
