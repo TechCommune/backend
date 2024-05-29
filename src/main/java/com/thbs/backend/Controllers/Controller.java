@@ -50,7 +50,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-@CrossOrigin(origins = "http://172.31.44.86:5173")
+@CrossOrigin(origins = "http://3.111.246.82:5173")
 @RequestMapping("api")
 public class Controller {
 
