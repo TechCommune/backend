@@ -50,6 +50,7 @@ public class QRDecodeController {
     @GetMapping("scan-qr")
     public ResponseEntity<String> scanQRCode(@RequestParam String encryptedData,
                                              @RequestHeader String token) {
+        String userName = null;
         try {
             String email = authService.verifyToken(token);
             UUID organizerId = eventProviderRepo.findByEmail(email).getId();
@@ -74,6 +75,7 @@ public class QRDecodeController {
             Optional<UserModel> userDetails = userRepo.findById(UUID.fromString(userId));
             if (userDetails.isPresent()) {
                 UserModel user = userDetails.get();
+                userName = user.getUserName();
                 
                 // Check if user is already an attendee for the event
                 Optional<AttendeeList> existingAttendee = attendeeRepo.findByEventIdAndEmail(UUID.fromString(eventId), user.getEmail());
@@ -83,7 +85,7 @@ public class QRDecodeController {
 
                 // Create attendee object
                 AttendeeList attendee = new AttendeeList();
-                attendee.setUserName(user.getUserName());
+                attendee.setUserName(userName);
                 attendee.setEmail(user.getEmail());
                 attendee.setEventId(UUID.fromString(eventId));
                 attendeeRepo.save(attendee);
@@ -91,8 +93,7 @@ public class QRDecodeController {
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
-
-            return ResponseEntity.ok("Decryption successful. User: " + userId + ", Event: " + eventId);
+            return ResponseEntity.ok(userName + " attended");
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
