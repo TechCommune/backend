@@ -25,7 +25,6 @@ import com.thbs.backend.Services.AESEncryptionService;
 import com.thbs.backend.Services.AuthService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("api")
 public class QRDecodeController {
 
