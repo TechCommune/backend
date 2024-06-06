@@ -96,7 +96,7 @@ public class EventEnrollmentService {
 
 //            
 
-            String link = "http://localhost:8090/api/scan-qr?encryptedData=" + encryptedData;
+            String link = "http://"+System.getenv("BACKEND_IP")+":8090/api/scan-qr?encryptedData=" + encryptedData;
             byte[] qrCodeBytes = qrCodeService.generateQRCode(link);
             byte[] pdfBytes = pdfService.createPDFFromQRCode(qrCodeBytes);
 
